@@ -13,6 +13,14 @@ import pip_audit._service as service
 from .interface import VulnerabilityFormat
 
 
+def xmlesc(txt):
+    txt = txt.replace("&", "&amp;")
+    txt = txt.replace("<", "&lt;")
+    txt = txt.replace(">", "&gt;")
+    txt = txt.replace('"', "&quot;")
+    txt = txt.replace("'", "&apos;")
+    return txt
+
 class JunitFormat(VulnerabilityFormat):
     """
     An implementation of `VulnerabilityFormat` that formats vulnerability results as a
@@ -107,7 +115,7 @@ class JunitFormat(VulnerabilityFormat):
             output_xml += self._format_success(dep,
                 messages=[f'<system-out><![CDATA[Version : {dep.version}\n]]></system-out>'])
 
-        output = f'  <testsuite name="pip-audit.{dep.canonical_name}" tests="{nb_tests}" '
+        output = f'  <testsuite name="pip-audit.{xmlesc(dep.canonical_name)}" tests="{nb_tests}" '
         output += f'failures="{nb_failures}" skipped="{nb_skipped}" errors="{nb_errored}">\n'
         output += output_xml
         output += '  </testsuite>\n'
@@ -122,7 +130,7 @@ class JunitFormat(VulnerabilityFormat):
         """
         if messages is None:
             messages = []
-        messages.insert(0, f'       <skipped message="{skip_reason}" />')
+        messages.insert(0, f'       <skipped message="{xmlesc(skip_reason)}" />')
         return self._format_success(dep, messages=messages, cls_prefix=cls_prefix)
 
     def _format_failure(self,
@@ -138,7 +146,7 @@ class JunitFormat(VulnerabilityFormat):
         fail = []
         fix_versions = ", ".join([str(ver) for ver in vuln.fix_versions])
         aliases = ", ".join(vuln.aliases)
-        fail.append(f'      <failure message="{vuln.id}" type="{atype}">')
+        fail.append(f'      <failure message="{xmlesc(vuln.id)}" type="{xmlesc(atype)}">')
         fail.append(f'<![CDATA[Package : {dep.canonical_name}')
         fail.append(f'Found version : {dep.version}')
         fail.append(f'Description : {vuln.description}')
@@ -158,7 +166,7 @@ class JunitFormat(VulnerabilityFormat):
         Returns a string with the errored testcase.
         """
         fail = []
-        fail.append(f'      <error message="{vuln.id}" type="{atype}">')
+        fail.append(f'      <error message="{xmlesc(vuln.id)}" type="{xmlesc(atype)}">')
         fail.append(f'<![CDATA[Package : {dep.canonical_name}')
         fail.append(f'Found version : {dep.version}')
         fail.append(f'Description : {vuln.description}')
@@ -176,7 +184,7 @@ class JunitFormat(VulnerabilityFormat):
         """
         Returns a string with the testcase.
         """
-        output_xml = f'    <testcase name="{cls_prefix}" classname="pip-audit.{dep.canonical_name}"'
+        output_xml = f'    <testcase name="{xmlesc(cls_prefix)}" classname="pip-audit.{xmlesc(dep.canonical_name)}"'
         if messages:
             output_xml += '>\n'
             for mess in messages:
