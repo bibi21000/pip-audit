@@ -8,7 +8,7 @@ import pip_audit._format as format
 @pytest.mark.parametrize("output_desc, output_aliases", ([True, False], [True, False]))
 def test_columns_not_manifest(output_desc, output_aliases):
     fmt = format.JunitFormat(output_desc, output_aliases)
-    assert not fmt.is_manifest
+    assert fmt.is_manifest
 
 
 def test_junit(vuln_data):

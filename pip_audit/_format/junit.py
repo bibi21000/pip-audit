@@ -46,7 +46,7 @@ class JunitFormat(VulnerabilityFormat):
         """
         See `VulnerabilityFormat.is_manifest`.
         """
-        return False
+        return True
 
     def format(
         self,
